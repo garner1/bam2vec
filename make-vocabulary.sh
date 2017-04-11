@@ -10,14 +10,14 @@ contextRange=1000		# extension of the context in bedtools window
 # use the bedopts tools to generate a bed file from a sam file
 ######################################
 
-# java -jar ~/tools/picard-tools-2.1.0/picard.jar SortSam INPUT="$samfile" OUTPUT="$datadir"/sorted_reads.bam SORT_ORDER=coordinate # sort the sam file
-# java -jar ~/tools/picard-tools-2.1.0/picard.jar MarkDuplicates INPUT="$datadir"/sorted_reads.bam OUTPUT="$datadir"/dedup_reads.bam METRICS_FILE=metrics.txt REMOVE_DUPLICATES=true # remove duplicates
+# java -jar ~/tools/picard-tools-2.1.0/picard.jar SortSam INPUT="$samfile" OUTPUT="$datadir"/sorted_reads.bam SORT_ORDER=coordinate # sort the samfile
+# java -jar ~/tools/picard-tools-2.1.0/picard.jar MarkDuplicates INPUT="$datadir"/sorted_reads.bam OUTPUT="$datadir"/dedup_reads.bam METRICS_FILE=metrics.txt REMOVE_DUPLICATES=true # remove duplicates from samfile
 
 # bam2bed < "$datadir"/dedup_reads.bam | # trasform to bed file
 # awk -v threshold=$thr '$5 >= threshold'| # filter out low quality mapped reads
-# cut -f-3 | # select only locations: chr start end
+# cut -f-3,12 | # select only locations: chr start end
 # LC_ALL=C sort | LC_ALL=C uniq -c | # count copies
-# awk '{OFS="\t";print $2,$3,$4,$1}' > $datadir/bedFromBam.bed 
+# awk '{OFS="\t";print $2,$3,$4,$5,$1}' > $datadir/bedFromBam.bed 
 
 # cp $datadir/bedFromBam.bed $datadir/bedFromBam_copy.bed 
 # bedtools window -w $contextRange -a $datadir/bedFromBam.bed -b $datadir/bedFromBam_copy.bed > $datadir/context.bed
@@ -27,24 +27,12 @@ contextRange=1000		# extension of the context in bedtools window
 # parallel "./unique_pairs.sh {}" ::: $(ls $datadir/context_chr*.txt) # find unique pairs of reads in each chromosome
 
 ####################################
+# The files $datadir/context_chr*.txt contain the pairs of reads that will define the context
+####################################
 
-# cd $datadir
-# rm -f x*
-# split -C 10m $datadir/bedfile.bed 
-# cd -
+rm -f $datadir/context_chr*random*.txt $datadir/context_chrUn*.txt  # remove useless chromosomes
 
-# #REMEMBER to set the len var in the code!!!!
-# parallel 'bash writevoc.sh {} {}.out' ::: `ls $datadir/x*`
-# cat $datadir/*.out > $datadir/vocabulary.bed
-
-# rm $datadir/x*			# clean the data directory
-
-# ######################################
-# # Split vocabulary.bed per chromosome
-# ######################################
-# cd $datadir
-# awk -F"\t" '{print > "vocabulary_"$1".bed"}' < $datadir/vocabulary.bed 
-# cd -
-# rm $datadir/vocabulary.bed 
-
+# REMEMBER to set the len var in the code!!!!
+parallel 'bash writevoc.sh {} {}.out' ::: `ls $datadir/context_chr{X,Y}.txt`
+cat $datadir/*.out > $datadir/vocabulary.bed
 
