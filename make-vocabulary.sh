@@ -26,8 +26,6 @@ contextRange=1000		# extension of the context in bedtools window
 
 # parallel "./unique_pairs.sh {}" ::: $(ls $datadir/context_chr*.txt) # find unique pairs of reads in each chromosome
 
-parallel "./remove_identical.sh {}" ::: $(ls $datadir/context_chr*.txt) # find unique pairs of reads in each chromosome
-
 ####################################
 
 # cd $datadir
