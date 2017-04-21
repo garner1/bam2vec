@@ -3,8 +3,8 @@
 datadir=~/Work/dataset
 samfile=~/Work/dataset/bliss/RM79_BICRO21/outdata_GTCGTATC/RM79_BICRO21.sam
 thr=60				# threshodl on mapping quality 
-len=10				# words' length
-contextRange=1000		# extension of the context in bedtools window
+len=9				# words' length, at the moment 3x3 consistently with the protvec algorithm with 3 aminoacid per word
+contextRange=45		# extension of the context in bedtools window, at the moment 4x(word-length)
 
 ######################################
 # use the bedopts tools to generate a bed file from a sam file
@@ -24,14 +24,13 @@ contextRange=1000		# extension of the context in bedtools window
 
 # awk -F"\t" -v dir="$datadir" '{print > dir"/context_"$1".txt"}' $datadir/context.bed # split by chromosome
 
-# parallel "./unique_pairs.sh {}" ::: $(ls $datadir/context_chr*.txt) # find unique pairs of reads in each chromosome
-# rm -f $datadir/context_chr*random*.txt $datadir/context_chrUn*.txt  # remove useless chromosomes
+# parallel "./unique_pairs.sh {}" ::: $(ls $datadir/context_chr{?,??}.txt) # find unique pairs of reads in each chromosome
 
 ####################################
 # The files $datadir/context_chr*.txt contain the pairs of reads that will define the context
 ####################################
 
-parallel bash writevoc.sh {} {}.out $len ::: `ls $datadir/context_chr*.txt` # this is not efficient enough
+parallel bash writevoc.sh {} {}.out $len ::: `ls $datadir/context_chr{?,??}.txt` # this is not efficient enough
 
 
 
