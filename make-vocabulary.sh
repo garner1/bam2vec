@@ -3,7 +3,7 @@
 datadir=~/Work/dataset
 samfile=~/Work/dataset/bliss/RM79_BICRO21/outdata_GTCGTATC/RM79_BICRO21.sam
 thr=60				# threshodl on mapping quality 
-len=70				# words' length
+len=10				# words' length
 contextRange=1000		# extension of the context in bedtools window
 
 ######################################
@@ -25,14 +25,13 @@ contextRange=1000		# extension of the context in bedtools window
 # awk -F"\t" -v dir="$datadir" '{print > dir"/context_"$1".txt"}' $datadir/context.bed # split by chromosome
 
 # parallel "./unique_pairs.sh {}" ::: $(ls $datadir/context_chr*.txt) # find unique pairs of reads in each chromosome
+# rm -f $datadir/context_chr*random*.txt $datadir/context_chrUn*.txt  # remove useless chromosomes
 
 ####################################
 # The files $datadir/context_chr*.txt contain the pairs of reads that will define the context
 ####################################
 
-rm -f $datadir/context_chr*random*.txt $datadir/context_chrUn*.txt  # remove useless chromosomes
+parallel bash writevoc.sh {} {}.out $len ::: `ls $datadir/context_chr*.txt` # this is not efficient enough
 
-# REMEMBER to set the len var in the code!!!!
-parallel 'bash writevoc.sh {} {}.out' ::: `ls $datadir/context_chr{X,Y}.txt`
-cat $datadir/*.out > $datadir/vocabulary.bed
+
 
