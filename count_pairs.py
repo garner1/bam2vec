@@ -3,7 +3,6 @@
 from itertools import combinations
 from collections import Counter
 import os.path
-import csv
 import sys
 
 def collect_pairs(file_name,window):

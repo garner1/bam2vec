@@ -38,7 +38,7 @@ cat $datadir/context_chr{?,??}.txt.out_counter.txt | cut -f2 > $datadir/file_2 #
 cat $datadir/file_? | LC_ALL=C sort -u | cat -n | awk '{print $2,$1}' > $datadir/vocabulary
 rm -f $datadir/file_{1,2}
 
-# ASSOCIATE MATRIX INDECES TO WORD-CONTEXT PAIRS
+# ASSOCIATE MATRIX INDECES TO WORD-CONTEXT PAIRS: the final .mat has count-row-col format from the third field
 parallel -k "cat {}| LC_ALL=C sort -k1,1 | LC_ALL=C join -1 1 -2 1 -o 1.1,1.2,1.3,2.2 - '$datadir'/vocabulary | tr ' ' '\t' > {}.joined_1" ::: `ls $datadir/context_chr{?,??}.txt.out_counter.txt`
 parallel -k "cat {}| LC_ALL=C sort -k2,2 | LC_ALL=C join -1 2 -2 1 -o 1.1,1.2,1.3,1.4,2.2 - '$datadir'/vocabulary | tr ' ' '\t' > {.}.mat" ::: `ls $datadir/context_chr{?,??}.txt.out_counter.txt.joined_1`
 rm -f $datadir/context_chr{?,??}.txt.out_counter.txt.joined_1
