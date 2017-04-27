@@ -5,20 +5,27 @@ from collections import Counter
 import os.path
 import sys
 
-def collect_pairs(file_name,window):
+def collect_pairs(file_name,window,wordsize):
     pair_counter = Counter()
     with open(file_name, 'rb') as infile:
         for line in infile:
-            lista = line.strip().split(',')
-            for index1 in range(len(lista)):
-                for index2 in range(index1+1,index1+window+1):
-                    if index2 < len(lista): 
-                        pair_counter[(lista[index1],lista[index2])] += 1
+            lista = line.strip().split('\t')
+            sentence = []
+            for wordstart in range(wordsize):
+                for startpos in xrange(wordstart,len(lista[3]),wordsize):
+                    word = lista[3][startpos:startpos+wordsize]
+                    if len(word) == 9: sentence.append(word)
+                    for index1 in range(len(sentence)):
+                        for index2 in range(index1+1,index1+window+1):
+                            if index2 < len(sentence): 
+                                pair_counter[(sentence[index1],sentence[index2])] += 1
     return pair_counter
-
-file_name = str(sys.argv[1])
+    
+file_name = str(sys.argv[1])    # ex: $datadir/context_chr{?,??}.txt
 window = int(sys.argv[2])
-p = collect_pairs(file_name,window)
+wordsize = int(sys.argv[3])
+
+p = collect_pairs(file_name,window,wordsize)
 
 with open(file_name + "_counter.txt",'w') as f:
     for k,v in  p.most_common():
