@@ -9,16 +9,15 @@ def collect_pairs(file_name,window,wordsize):
     pair_counter = Counter()
     with open(file_name, 'rb') as infile:
         for line in infile:
-            lista1 = line.strip().split('\t')
-            lista2 = line.strip().split('\t')
+            lista = line.strip().split('\t')
             sentence = []
             for wordstart in range(wordsize): # loop over starting position of the word
-                for startpos in xrange(wordstart,len(lista1[3]),wordsize): # loop over words in first sentence
-                    word = lista1[3][startpos:startpos+wordsize]
+                for startpos in xrange(wordstart,len(lista[3]),wordsize): # loop over words in first sentence
+                    word = lista[3][startpos:startpos+wordsize]
                     if len(word) == 9: sentence.append(word)
-                if len(lista2) > 4:
-                    for startpos in xrange(wordstart,len(lista2[8]),wordsize): # loop over words in second sentence
-                        word = lista2[8][startpos:startpos+wordsize]
+                if len(lista) > 4:
+                    for startpos in xrange(wordstart,len(lista[8]),wordsize): # loop over words in second sentence
+                        word = lista[8][startpos:startpos+wordsize]
                         if len(word) == 9: sentence.append(word)
                 for index1 in range(len(sentence)): # count cooccurrences
                     for index2 in range(index1+1,index1+window+1):
